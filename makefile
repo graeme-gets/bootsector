@@ -9,3 +9,5 @@ e:
 	vim boot.asm
 m:
 	vim makefile	
+b:
+	bochs
