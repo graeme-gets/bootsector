@@ -11,3 +11,6 @@ m:
 	vim makefile	
 b:
 	bochs
+
+c1:
+	nasm findx.asm -f bin -o boot_sec.bin
