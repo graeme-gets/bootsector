@@ -1,0 +1,177 @@
+     1                                  ;
+     2                                  ; A Simple Boot sector to print a message
+     3                                  ;
+     4                                  
+     5                                  
+     6                                  [org 0x7c00]
+     7                                  
+     8                                  ; Start Up
+     9                                  
+    10 00000000 8816[EE00]              mov [BOOT_DRIVE], dl		; BIOS stores our boot drive in DL,so it’s	best to remember this for later.
+    11                                  
+    12 00000004 BE[DB00]                	mov si, BOOT_MSG
+    13 00000007 E83A00                  	call printString
+    14 0000000A B102                    	mov cl,0x02        ; two byte value 
+    15 0000000C 66BA34120000            	mov edx,0x1234
+    16 00000012 E84700                  	call printHex
+    17 00000015 BE[8B00]                	mov si, NEW_LINE
+    18 00000018 E82900                  	call printString
+    19                                  	
+    20                                  	
+    21                                  
+    22                                  	; read from disk
+    23                                  	
+    24 0000001B BD0080                  	mov bp,0x8000				; set stack safely out of the way
+    25 0000001E 89EC                    	mov sp, bp
+    26                                  
+    27 00000020 BB0090                  	mov bx, 0x9000				; Load 5 sectors to 0x0000(ES):0x9000(BX) from boot disk
+    28 00000023 B605                    	mov dh, 5			
+    29 00000025 8A16[EE00]              	mov dl, [BOOT_DRIVE]
+    30 00000029 E86200                  	call diskLoad
+    31                                  
+    32 0000002C 8B160090                	mov dx, [0x9000]			; PRIN TTH EFIRST LOADED WORD
+    33 00000030 B90200                  	mov cx,2					; print two bytes
+    34 00000033 E82600                  	call printHex
+    35                                  
+    36 00000036 8B160092                	mov dx, [0x9000 + 512]		; prin tdata that came form 2nd sector
+    37 0000003A B90200                  	mov cx,2
+    38 0000003D E81C00                  	call printHex
+    39 00000040 EB00                    	jmp end
+    40                                  
+    41                                  
+    42                                  end:
+    43 00000042 FA                      	cli
+    44 00000043 F4                      	hlt	
+    45                                  
+    46                                  	
+    47                                  
+    48                                  
+    49                                  
+    50                                  ; Includes
+    51                                  %include "print.asm"
+     1                              <1> ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+     2                              <1> ; Prints null terminated string
+     3                              <1> ; Put first letter into SI
+     4                              <1> ; Set BX to number of bytes to use
+     5                              <1> ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+     6                              <1> printString:
+     7 00000044 AC                  <1> 	lodsb				; Load the byte at address in SI to AL and Inc SI
+     8 00000045 3C00                <1> 	cmp al,0			; check for end of line
+     9 00000047 7405                <1> 	je printStringEnd
+    10 00000049 E80300              <1> 	call printChar
+    11 0000004C EBF6                <1> 	jmp printString
+    12                              <1> printStringEnd:
+    13 0000004E C3                  <1> 	ret
+    14                              <1> 
+    15                              <1> ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    16                              <1> ; Prints a single character to the BIOS Teletype function
+    17                              <1> ; Put char in AL
+    18                              <1> ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    19                              <1> printChar:
+    20                              <1> 	; Call BIOS Routing to print
+    21 0000004F 50                  <1> 	push ax
+    22 00000050 53                  <1> 	push bx
+    23 00000051 B40E                <1> 	mov ah, 0x0e		; BIOS Teletype function
+    24 00000053 B700                <1> 	mov bh,0			; Page 0
+    25 00000055 B347                <1> 	mov bl, 0x47		; Text Attribute (light grey on black)
+    26 00000057 CD10                <1> 	int 0x10			; call BIOS intterupt 0x10
+    27 00000059 5B                  <1> 	pop bx
+    28 0000005A 58                  <1> 	pop ax
+    29 0000005B C3                  <1> 	ret
+    30                              <1> 
+    31                              <1> ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    32                              <1> ; Prints a byte or word in hex format
+    33                              <1> ; Assumes value is in DX and can be 32 bit value
+    34                              <1> ; Set BX to number of bytes to use
+    35                              <1> ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    36                              <1> printHex:
+    37 0000005C 6651                <1> 		push ecx				; save cl
+    38 0000005E B004                <1> 		mov al,4			; load number of bytes for full 32 bit number
+    39 00000060 28C8                <1> 		sub al,cl			; get number of byte to shift out for alignment	
+    40 00000062 B108                <1> 		mov cl,8			; set bit multiplier
+    41 00000064 F6E1                <1> 		mul cl				; multiply by byute count - we now have numebr of bits to shift right
+    42 00000066 88C1                <1> 		mov cl,al
+    43 00000068 66D3CA              <1> 		ror edx,cl
+    44 0000006B 6659                <1> 		pop ecx				; restore cl
+    45 0000006D D0E1                <1> 		shl cl,1			; multiply by 2 for nibbles
+    46                              <1> 		; todo: could put check in for a value greater than 4
+    47                              <1> hexLoop:
+    48 0000006F 80F900              <1> 		cmp cl,0			; if bx = 0 then exit
+    49 00000072 7416                <1>         jz hexFin 
+    50 00000074 66C1C204            <1>         rol edx,4        ; Rotate the word to get first byte ready
+    51 00000078 49                  <1>         dec cx
+    52                              <1>         ; Swap 
+    53 00000079 88D0                <1>         mov al,dl       ; copy byte into AL
+    54 0000007B 240F                <1> 		and al,0x0f		; clear high nibble
+    55                              <1>         
+    56                              <1>         ; Handle al first
+    57 0000007D 3C0A                <1>         cmp al,0x0a
+    58 0000007F 7202                <1> 		jb nibLess
+    59 00000081 0407                <1> 		add al,0x07		; add offset for Hex letters
+    60                              <1> nibLess: 			 
+    61 00000083 0430                <1> 		add al,0x30 
+    62 00000085 E8C7FF              <1>         call printChar
+    63 00000088 EBE5                <1>         jmp hexLoop
+    64                              <1> hexFin:
+    65 0000008A C3                  <1>         ret
+    66                              <1> 
+    67                              <1> 
+    68 0000008B 0A0D00              <1> NEW_LINE:	db  0xa, 0xd,0
+    52                                  %include "disk.asm"
+     1                              <1> ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+     2                              <1> ; Function to read from the disk
+     3                              <1> ;load DHsectors to ES:BX from drive DL
+     4                              <1> ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+     5                              <1> 
+     6                              <1> diskLoad:
+     7 0000008E 52                  <1>     push dx
+     8                              <1> 
+     9 0000008F B402                <1>     mov ah,0x02         ; BIOS read sector function
+    10 00000091 88F0                <1>     mov al,dh           ; Read DH sectors
+    11 00000093 B500                <1>     mov ch,0x00         ; Select cylinder 0
+    12 00000095 B600                <1>     mov dh,0x00
+    13 00000097 B102                <1>     mov cl,0x02         ; Start  reading from second sector - ie after boot sector
+    14                              <1> 
+    15 00000099 CD13                <1>     int 0x13            ; BIOS interrupt
+    16                              <1> 
+    17 0000009B 7206                <1>     jc disk_error_BIOS
+    18                              <1> 
+    19 0000009D 5A                  <1>     pop dx
+    20 0000009E 38C6                <1>     cmp dh,al           ; if AL (sectors read) != DH (sectors ecpected) 
+    21 000000A0 7509                <1>     jne disk_error_SECT      
+    22 000000A2 C3                  <1>     ret
+    23                              <1> 
+    24                              <1> disk_error_BIOS:
+    25 000000A3 BE[B300]            <1>         mov si, DISK_ERROR_BIOS
+    26 000000A6 E89BFF              <1>         call printString
+    27 000000A9 EBFE                <1>         jmp $
+    28                              <1> 
+    29                              <1> disk_error_SECT:
+    30 000000AB BE[C600]            <1>         mov si, DISK_ERROR_SECT
+    31 000000AE E893FF              <1>         call printString
+    32 000000B1 EBFE                <1>         jmp $
+    33                              <1> 
+    34                              <1> ; Variables
+    35 000000B3 4469736B2042494F53- <1> DISK_ERROR_BIOS: db "Disk BIOS error!", 0xa, 0xd, 0
+    35 000000BC 206572726F72210A0D- <1>
+    35 000000C5 00                  <1>
+    36 000000C6 4469736B2073656374- <1> DISK_ERROR_SECT: db "Disk sector error!", 0xa, 0xd, 0
+    36 000000CF 6F72206572726F7221- <1>
+    36 000000D8 0A0D00              <1>
+    53                                  
+    54                                  
+    55                                  ;GLOBAL VERIABLES
+    56 000000DB 4C6F6164696E67206F-     BOOT_MSG: db 'Loading osGG-x86', 0xa, 0xd, 0
+    56 000000E4 7347472D7838360A0D-
+    56 000000ED 00                 
+    57 000000EE 00                      BOOT_DRIVE: db 0
+    58                                  
+    59                                  
+    60                                  ; Padding Bios and Magic number
+    61                                  
+    62 000000EF 00<rep 10Fh>            	times 510-($-$$) db 0
+    63                                  
+    64 000001FE 55AA                    	dw 0xaa55
+    65                                  
+    66 00000200 DADA<rep 100h>          	times 256 dw 0xdada
+    67 00000400 CEFA<rep 100h>          	times 256 dw 0xface

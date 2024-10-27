@@ -11,16 +11,17 @@ mov [BOOT_DRIVE], dl		; BIOS stores our boot drive in DL,so it’s	best to remem
 
 	mov si, BOOT_MSG
 	call printString
-	mov bx,0x04        ; two byte value 
-	mov edx,0xabcd1234
+	mov cl,0x02        ; two byte value 
+	mov edx,0x1234
 	call printHex
 	mov si, NEW_LINE
 	call printString
 	
+	
 
 	; read from disk
 	
-	mov bp,0x8000				; set stack safly out of the way
+	mov bp,0x8000				; set stack safely out of the way
 	mov sp, bp
 
 	mov bx, 0x9000				; Load 5 sectors to 0x0000(ES):0x9000(BX) from boot disk
@@ -29,11 +30,11 @@ mov [BOOT_DRIVE], dl		; BIOS stores our boot drive in DL,so it’s	best to remem
 	call diskLoad
 
 	mov dx, [0x9000]			; PRIN TTH EFIRST LOADED WORD
-	mov bx,2					; print two bytes
+	mov cx,2					; print two bytes
 	call printHex
 
 	mov dx, [0x9000 + 512]		; prin tdata that came form 2nd sector
-	mov bx,2
+	mov cx,2
 	call printHex
 	jmp end
 

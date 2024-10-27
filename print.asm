@@ -34,13 +34,21 @@ printChar:
 ; Set BX to number of bytes to use
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 printHex:
-		shl bx,1			; multiply by 2 for nibbles
+		push ecx				; save cl
+		mov al,4			; load number of bytes for full 32 bit number
+		sub al,cl			; get number of byte to shift out for alignment	
+		mov cl,8			; set bit multiplier
+		mul cl				; multiply by byute count - we now have numebr of bits to shift right
+		mov cl,al
+		ror edx,cl
+		pop ecx				; restore cl
+		shl cl,1			; multiply by 2 for nibbles
 		; todo: could put check in for a value greater than 4
 hexLoop:
-		cmp bx,0			; if bx = 0 then exit
+		cmp cl,0			; if bx = 0 then exit
         jz hexFin 
         rol edx,4        ; Rotate the word to get first byte ready
-        dec bx
+        dec cx
         ; Swap 
         mov al,dl       ; copy byte into AL
 		and al,0x0f		; clear high nibble
