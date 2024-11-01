@@ -1,4 +1,6 @@
-; GDT
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; GDT - Global Discriptor table
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 gdt_start: 
 
@@ -6,7 +8,11 @@ gdt_null:       ;the madatory null descriptor
     dd 0x0
     dd 0x0
 
-gdt_code :       ; The code segment descriptor
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; CODE SEGMENT descriptor
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+gdt_code:      
 
     dw 0xffff       ; Limite (bits 0-15)
     dw 0x0          ; Base (bits 0-15)
@@ -15,6 +21,9 @@ gdt_code :       ; The code segment descriptor
     db 11001111b    ; 2nd flags, limit (bits 16-19)
     db 0x0          ; Base (bits 24-31)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; DATA SEGMENT descriptor
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 gdt_data:       ; The data segment desciptor
 
