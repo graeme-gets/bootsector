@@ -26,13 +26,13 @@ cls:
     pusha  
     mov eax, VIDEO_MEMORY_SIZE-1
     mov edx, VIDEO_MEMORY
-    add edx, eax
-clsloop:
-    mov al,0x41                 ; Space character
+    mov al,0x20                 ; Space character
     mov ah,WHITE_ON_BLUE
+clsloop:
     mov [edx],ax
-    dec edx
-    cmp edx,VIDEO_MEMORY_SIZE-1
+    dec ebx
+    add edx, 2
+    cmp ebx,0
     jne clsloop
     popa
     ret
