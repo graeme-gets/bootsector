@@ -32,7 +32,7 @@ ifeq ($(MACHINE),Linux)
 	bochs -qf ./bochsrc.linux
 else
 	@echo "Running for WIN32"
-	bochs -qf ./bochsrc.win
+	bochsdbg -qf ./bochsrc.win
 	#bochs -qf ./bochsrc.win
 endif	
 
