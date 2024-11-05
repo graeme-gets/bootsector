@@ -10,27 +10,17 @@
     10                                  ; Start up in 16 bit real mode
     11                                  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     12                                  
-<<<<<<< HEAD
-    13 00000000 8816[7101]                  mov [BOOT_DRIVE], dl    ; Save boot drive
+    13 00000000 8816[6F01]                  mov [BOOT_DRIVE], dl    ; Save boot drive
     14                                  
     15 00000004 BD0090                  	mov bp, 0x9000			; Set up stack pointer
     16 00000007 89EC                    	mov sp, bp
     17                                  
-    18 00000009 BE[4801]                	mov si, MSG_REAL_MODE		; Print REAl MODE message
+    18 00000009 BE[4601]                	mov si, MSG_REAL_MODE		; Print REAl MODE message
     19 0000000C E80800                  	call printString
-=======
-    13 00000000 BD0090                  	mov bp, 0x9000			; Set up stack pointer
-    14 00000003 89EC                    	mov sp, bp
-    15                                  
-    16 00000005 BE[DF00]                	mov si, MSG_REAL_MODE		; Print REAl MODE message
-    17 00000008 E80500                  	call printString
-    18                                  
-    19 0000000B E8A200                  	call switch_to_pm		; Initiate the switch to Protected mode
->>>>>>> origin/master
     20                                  
-    21 0000000F E82301                      call load_kernel
+    21 0000000F E82101                      call load_kernel
     22                                  
-    23 00000012 E8F100                  	call switch_to_pm		; Initiate the switch to Protected mode
+    23 00000012 E8EF00                  	call switch_to_pm		; Initiate the switch to Protected mode
     24                                  
     25 00000015 EBFE                    	jmp $				; Infinite loop - Should never get here
     26                                  
@@ -221,81 +211,42 @@
     23                              <1> COLOR_LT_BLUE       equ 0x5555FF
     24                              <1> 
     25                              <1> cls:
-<<<<<<< HEAD
     26 000000CC 60                  <1>     pusha  
     27 000000CD B89F0F0000          <1>     mov eax, VIDEO_MEMORY_SIZE-1
     28 000000D2 BA00800B00          <1>     mov edx, VIDEO_MEMORY
-    29 000000D7 01C2                <1>     add edx, eax
-    30                              <1> clsloop:
-    31 000000D9 B041                <1>     mov al,0x41                 ; Space character
-    32 000000DB B41F                <1>     mov ah,WHITE_ON_BLUE
-    33 000000DD 668902              <1>     mov [edx],ax
-    34 000000E0 4A                  <1>     dec edx
-    35 000000E1 81FA9F0F0000        <1>     cmp edx,VIDEO_MEMORY_SIZE-1
-    36 000000E7 75F0                <1>     jne clsloop
-    37 000000E9 61                  <1>     popa
-    38 000000EA C3                  <1>     ret
-    39                              <1>     
-    40                              <1> print_string_pm:
-    41 000000EB 60                  <1> 	pusha
-    42 000000EC BA00800B00          <1> 	mov edx, VIDEO_MEMORY
-    43                              <1> 
-    44                              <1> print_string_pm_loop:
-    45 000000F1 8A03                <1> 	mov al, [ebx]
-    46 000000F3 B41F                <1> 	mov ah, WHITE_ON_BLUE
-    47                              <1> 
-    48 000000F5 3C00                <1> 	cmp al, 0
-    49 000000F7 740B                <1> 	je print_string_pm_done
-    50                              <1> 
-    51 000000F9 668902              <1> 	mov [edx], ax
-    52                              <1> 
-    53 000000FC 83C301              <1> 	add ebx, 1
-    54 000000FF 83C202              <1> 	add edx, 2
-    55                              <1> 
-    56 00000102 EBED                <1> 	jmp print_string_pm_loop
-    57                              <1> 
-    58                              <1> print_string_pm_done:
-    59 00000104 61                  <1> 	popa
-    60 00000105 C3                  <1> 	ret
-    31                                  %include "switchPM.asm"
-=======
-    26 00000078 60                  <1>     pusha  
-    27 00000079 BB9F0F0000          <1>     mov ebx, VIDEO_MEMORY_SIZE-1
-    28 0000007E BA00800B00          <1>     mov edx, VIDEO_MEMORY
-    29 00000083 B020                <1>     mov al,0x20                 ; Space character
-    30 00000085 B41F                <1>     mov ah,WHITE_ON_BLUE
+    29 000000D7 B020                <1>     mov al,0x20                 ; Space character
+    30 000000D9 B41F                <1>     mov ah,WHITE_ON_BLUE
     31                              <1> clsloop:
-    32 00000087 668902              <1>     mov [edx],ax
-    33 0000008A 4B                  <1>     dec ebx
-    34 0000008B 83C202              <1>     add edx, 2
-    35 0000008E 83FB00              <1>     cmp ebx,0
-    36 00000091 75F4                <1>     jne clsloop
-    37 00000093 61                  <1>     popa
-    38 00000094 C3                  <1>     ret
+    32 000000DB 668902              <1>     mov [edx],ax
+    33 000000DE 4B                  <1>     dec ebx
+    34 000000DF 83C202              <1>     add edx, 2
+    35 000000E2 83FB00              <1>     cmp ebx,0
+    36 000000E5 75F4                <1>     jne clsloop
+    37 000000E7 61                  <1>     popa
+    38 000000E8 C3                  <1>     ret
     39                              <1>     
     40                              <1> print_string_pm:
-    41 00000095 60                  <1> 	pusha
-    42 00000096 BA00800B00          <1> 	mov edx, VIDEO_MEMORY
+    41 000000E9 60                  <1> 	pusha
+    42 000000EA BA00800B00          <1> 	mov edx, VIDEO_MEMORY
     43                              <1> 
     44                              <1> print_string_pm_loop:
-    45 0000009B 8A03                <1> 	mov al, [ebx]
-    46 0000009D B41F                <1> 	mov ah, WHITE_ON_BLUE
+    45 000000EF 8A03                <1> 	mov al, [ebx]
+    46 000000F1 B41F                <1> 	mov ah, WHITE_ON_BLUE
     47                              <1> 
-    48 0000009F 3C00                <1> 	cmp al, 0
-    49 000000A1 740B                <1> 	je print_string_pm_done
+    48 000000F3 3C00                <1> 	cmp al, 0
+    49 000000F5 740B                <1> 	je print_string_pm_done
     50                              <1> 
-    51 000000A3 668902              <1> 	mov [edx], ax
+    51 000000F7 668902              <1> 	mov [edx], ax
     52                              <1> 
-    53 000000A6 83C301              <1> 	add ebx, 1
-    54 000000A9 83C202              <1> 	add edx, 2
+    53 000000FA 83C301              <1> 	add ebx, 1
+    54 000000FD 83C202              <1> 	add edx, 2
     55                              <1> 
-    56 000000AC EBED                <1> 	jmp print_string_pm_loop
+    56 00000100 EBED                <1> 	jmp print_string_pm_loop
     57                              <1> 
     58                              <1> print_string_pm_done:
-    59 000000AE 61                  <1> 	popa
-    60 000000AF C3                  <1> 	ret
-    26                                  %include "switchPM.asm"
->>>>>>> origin/master
+    59 00000102 61                  <1> 	popa
+    60 00000103 C3                  <1> 	ret
+    31                                  %include "switchPM.asm"
      1                              <1> ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
      2                              <1> ; Routine to switch from 16 Real Mode into 
      3                              <1> ; 32 bit protected mode
@@ -303,25 +254,14 @@
      5                              <1> 
      6                              <1> [bits 16]
      7                              <1> switch_to_pm:
-<<<<<<< HEAD
-     8 00000106 FA                  <1> 	cli                         ; Clear interrupt flag
-     9 00000107 0F0116[C600]        <1> 	lgdt [gdt_descriptor]       ; Load the GDT descriptor
+     8 00000104 FA                  <1> 	cli                         ; Clear interrupt flag
+     9 00000105 0F0116[C600]        <1> 	lgdt [gdt_descriptor]       ; Load the GDT descriptor
     10                              <1> 	
-    11 0000010C 0F20C0              <1> 	mov eax,cr0                 ; Set the proteced mode flag
-    12 0000010F 6683C801            <1> 	or eax, 0x1
-    13 00000113 0F22C0              <1> 	mov cr0,eax
+    11 0000010A 0F20C0              <1> 	mov eax,cr0                 ; Set the proteced mode flag
+    12 0000010D 6683C801            <1> 	or eax, 0x1
+    13 00000111 0F22C0              <1> 	mov cr0,eax
     14                              <1> 
-    15 00000116 EA[1B01]0800        <1> 	jmp CODE_SEG:init_pm        ; Jump to the new CODE segment as per the GDT
-=======
-     8 000000B0 FA                  <1> 	cli                         ; Clear interrupt flag
-     9 000000B1 0F0116[7200]        <1> 	lgdt [gdt_descriptor]       ; Load the GDT descriptor
-    10                              <1> 	
-    11 000000B6 0F20C0              <1> 	mov eax,cr0                 ; Set the proteced mode flag
-    12 000000B9 6683C801            <1> 	or eax, 0x1
-    13 000000BD 0F22C0              <1> 	mov cr0,eax
-    14                              <1> 
-    15 000000C0 EA[C500]0800        <1> 	jmp CODE_SEG:init_pm        ; Jump to the new CODE segment as per the GDT
->>>>>>> origin/master
+    15 00000114 EA[1901]0800        <1> 	jmp CODE_SEG:init_pm        ; Jump to the new CODE segment as per the GDT
     16                              <1> 
     17                              <1> 
     18                              <1> ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -332,36 +272,35 @@
     23                              <1> 
     24                              <1> ; Initialise registers and the stack once in PM
     25                              <1> init_pm:
-<<<<<<< HEAD
-    26 0000011B 66B81000            <1> 	mov ax, DATA_SEG	; Move old Segments to DATA_SEG defined in GDT
-    27 0000011F 8ED8                <1> 	mov ds, ax
-    28 00000121 8ED0                <1> 	mov ss, ax
-    29 00000123 8EC0                <1> 	mov es, ax
-    30 00000125 8EE0                <1> 	mov fs, ax
-    31 00000127 8EE8                <1> 	mov gs, ax
+    26 00000119 66B81000            <1> 	mov ax, DATA_SEG	; Move old Segments to DATA_SEG defined in GDT
+    27 0000011D 8ED8                <1> 	mov ds, ax
+    28 0000011F 8ED0                <1> 	mov ss, ax
+    29 00000121 8EC0                <1> 	mov es, ax
+    30 00000123 8EE0                <1> 	mov fs, ax
+    31 00000125 8EE8                <1> 	mov gs, ax
     32                              <1> 
-    33 00000129 BD00000900          <1> 	mov ebp, 0x90000	; Update stack point to top of free space
-    34 0000012E 89EC                <1> 	mov esp, ebp		
+    33 00000127 BD00000900          <1> 	mov ebp, 0x90000	; Update stack point to top of free space
+    34 0000012C 89EC                <1> 	mov esp, ebp		
     35                              <1> 
-    36 00000130 E82B000000          <1> 	call BEGIN_PM       ; Call the begining of main code 
+    36 0000012E E82B000000          <1> 	call BEGIN_PM       ; Call the begining of main code 
     37                              <1> 	
     32                                  
     33                                  [bits 16]
     34                                  
     35                                  load_kernel:
-    36 00000135 BE[9D01]                    mov si, MSG_LOAD_KERNEL
-    37 00000138 E8DCFE                      call printString
+    36 00000133 BE[9B01]                    mov si, MSG_LOAD_KERNEL
+    37 00000136 E8DEFE                      call printString
     38                                  
-    39 0000013B BB0010                      mov bx, KERNEL_OFFSET
-    40 0000013E B60F                        mov dh, 15
-    41 00000140 8A16[7101]                  mov dl,[BOOT_DRIVE]
-    42 00000144 E81AFF                      call diskLoad
+    39 00000139 BB0010                      mov bx, KERNEL_OFFSET
+    40 0000013C B60F                        mov dh, 15
+    41 0000013E 8A16[6F01]                  mov dl,[BOOT_DRIVE]
+    42 00000142 E81CFF                      call diskLoad
     43                                  
-    44 00000147 C3                          ret
+    44 00000145 C3                          ret
     45                                  
-    46 00000148 5374617274696E6720-     MSG_REAL_MODE db "Starting in 16-Bit Mode",0
-    46 00000151 696E2031362D426974-
-    46 0000015A 204D6F646500       
+    46 00000146 5374617274696E6720-     MSG_REAL_MODE db "Starting in 16-Bit Mode",0
+    46 0000014F 696E2031362D426974-
+    46 00000158 204D6F646500       
     47                                  
     48                                  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     49                                  ; Protected Mode code 
@@ -369,61 +308,22 @@
     51                                  
     52                                  BEGIN_PM:
     53                                  	; TODO: clear screen (direct write to memory
-    54 00000160 E869FF                      call cls
-    55 00000163 66BB[72010000]          	mov ebx, MSG_PROT_MODE		; Print Message
-    56 00000169 E87FFF                  	call print_string_pm
+    54 0000015E E86BFF                      call cls
+    55 00000161 66BB[70010000]          	mov ebx, MSG_PROT_MODE		; Print Message
+    56 00000167 E87FFF                  	call print_string_pm
     57                                  
-    58 0000016C E8(0010)                    call KERNEL_OFFSET
+    58 0000016A E8(0010)                    call KERNEL_OFFSET
     59                                  
-    60 0000016F EBFE                    	jmp $
+    60 0000016D EBFE                    	jmp $
     61                                  
-    62 00000171 00                      BOOT_DRIVE db 0
-    63 00000172 537563636573732120-     MSG_PROT_MODE db "Success! We are in 32 bit protected mode",0xa,0xd, 0
-    63 0000017B 57652061726520696E-
-    63 00000184 203332206269742070-
-    63 0000018D 726F74656374656420-
-    63 00000196 6D6F64650A0D00     
-    64 0000019D 4C6F6164696E67204B-     MSG_LOAD_KERNEL db "Loading Kernel",0xa,0xd,0
-    64 000001A6 65726E656C0A0D00   
+    62 0000016F 00                      BOOT_DRIVE db 0
+    63 00000170 537563636573732120-     MSG_PROT_MODE db "Success! We are in 32 bit protected mode",0xa,0xd, 0
+    63 00000179 57652061726520696E-
+    63 00000182 203332206269742070-
+    63 0000018B 726F74656374656420-
+    63 00000194 6D6F64650A0D00     
+    64 0000019B 4C6F6164696E67204B-     MSG_LOAD_KERNEL db "Loading Kernel",0xa,0xd,0
+    64 000001A4 65726E656C0A0D00   
     65                                  
-    66 000001AE 00<rep 50h>             	times 510-($-$$) db 0
+    66 000001AC 00<rep 52h>             	times 510-($-$$) db 0
     67 000001FE 55AA                    	dw 0xaa55
-=======
-    26 000000C5 66B81000            <1> 	mov ax, DATA_SEG	; Move old Segments to DATA_SEG defined in GDT
-    27 000000C9 8ED8                <1> 	mov ds, ax
-    28 000000CB 8ED0                <1> 	mov ss, ax
-    29 000000CD 8EC0                <1> 	mov es, ax
-    30 000000CF 8EE0                <1> 	mov fs, ax
-    31 000000D1 8EE8                <1> 	mov gs, ax
-    32                              <1> 
-    33 000000D3 BD00000900          <1> 	mov ebp, 0x90000	; Update stack point to top of free space
-    34 000000D8 89EC                <1> 	mov esp, ebp		
-    35                              <1> 
-    36 000000DA E818000000          <1> 	call BEGIN_PM       ; Call the begining of main code 
-    37                              <1> 	
-    27                                  
-    28 000000DF 5374617274696E6720-     MSG_REAL_MODE db "Starting in 16-Bit Mode",0
-    28 000000E8 696E2031362D426974-
-    28 000000F1 204D6F646500       
-    29                                  
-    30                                  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    31                                  ; Protected Mode code 
-    32                                  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    33                                  
-    34                                  BEGIN_PM:
-    35                                  	; TODO: clear screen (direct write to memory
-    36 000000F7 E87CFFFFFF                  call cls
-    37 000000FC BB[08010000]            	mov ebx, MSG_PROT_MODE		; Print Message
-    38 00000101 E88FFFFFFF              	call print_string_pm
-    39                                  
-    40 00000106 EBFE                    	jmp $
-    41                                  
-    42 00000108 537563636573732120-     MSG_PROT_MODE db "Success! We are in 32 bit protected mode",0
-    42 00000111 57652061726520696E-
-    42 0000011A 203332206269742070-
-    42 00000123 726F74656374656420-
-    42 0000012C 6D6F646500         
-    43                                  
-    44 00000131 00<rep CDh>             	times 510-($-$$) db 0
-    45 000001FE 55AA                    	dw 0xaa55
->>>>>>> origin/master
